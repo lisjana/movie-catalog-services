@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Git Clone') {
+            steps {
+                echo 'Git Clone project'
+                git "https://github.com/lisjana/movie-catalog-services.git"
+                echo 'Clone Success!'
+            }
+        }
+
+        stage('Build project with maven') {
+            steps {
+                echo 'Building'
+                sh "mvn clean install -Dmaven.test.skip=true"
+                echo 'Success'
+            }
+        }
+ 
+        stage('Stage run jar') {
+            steps {
+                withEnv(['JENKINS_NODE_COOKIE=dontkill']) {
+                    sh 'java -jar target/movie-catalog-services-*.jar &'
+                }
+            }
+        }
+    }
+}
